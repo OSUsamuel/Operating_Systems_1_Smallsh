@@ -4,9 +4,18 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <signal.h>
+
+const int MAX_BG = 512;
+static int bg_processes[512];
+static int finished[512];
+
+pid_t foreground_pid = 0;
+
+int foreground_exit_status = 0;
+int foreground_mode = 0;
 
 
-int MAX_BG = 512;
 
 
 
@@ -17,6 +26,41 @@ struct command_line{
     char* output_file;
     int background;
 };
+
+void handle_SIGINT(int signo){
+	
+
+    
+    // Convert integer to string
+    char buffer[20]; // Assuming a maximum of 20 digits
+    int length = snprintf(buffer, sizeof(buffer), "terminated by signal %d\n", signo);
+    
+    // Write the string to standard output
+    write(1, buffer, length);
+    
+
+}
+
+
+void handle_SIGSTP(int signo){
+    char* enter_fg_mode = "\nEntering foreground-only mode (& is now ignored)\n: ";
+    char* exit_fg_mode = "\nExiting foreground-only mode\n: ";
+
+    if(foreground_mode){
+        write(1, exit_fg_mode, strlen(exit_fg_mode));
+        foreground_mode = 0;
+    }else {
+        write(1, enter_fg_mode, strlen(enter_fg_mode));
+        foreground_mode = 1;
+    }
+
+}
+
+
+
+
+
+
 
 
 
@@ -45,8 +89,14 @@ int replaceSubstring(char *string, const char *substring, const char *replacemen
 int interpret(struct command_line* cmd){
     char* command = cmd->command;
 
-    static int bg_processes[512];
-    static int finished[512];
+        struct sigaction sa;
+
+        sa.sa_handler = SIG_IGN;
+
+        sigaction(SIGINT, &sa, NULL);
+
+
+
 
 
     if(strcmp(command, "exit") == 0){
@@ -67,22 +117,40 @@ int interpret(struct command_line* cmd){
         
 
     } else if(strcmp(command, "status") == 0){
+        printf("Exit status %d\n", foreground_exit_status);
+        fflush(stdout);
         //Handles the status case
 
     } else{
         //Handles everything else
-        if(fork() == 0){
-            
+
+        
+        
+        
+
+        int pid = fork();
+        if(pid != 0){
             if(cmd->background){
-                for(int i = 0; i < MAX_BG; i++){
-                    if(bg_processes[i] == 0){
-                        bg_processes[i] = getpid();
-                        printf("Successfully added process %d to background", bg_processes[i]);
-                        break;
+                    for(int i = 0; i < MAX_BG; i++){
+                        if(bg_processes[i] == 0){
+                            bg_processes[i] = pid;
+                            printf("Successfully added process %d to background\n", bg_processes[i]);
+                            break;
+                        }
                     }
                 }
-            }
+               
+            } 
 
+
+        if(pid == 0){
+            foreground_pid = getpid();
+            sa.sa_handler = SIG_DFL;
+            sigaction(SIGINT, &sa, NULL);
+
+
+
+            
 
             int count = 0;
             while(cmd->args[count] != NULL){
@@ -99,7 +167,7 @@ int interpret(struct command_line* cmd){
 
             int index = 0;
 
-            printf("Output file: %s\nInput file: %s\n", cmd->output_file, cmd->input_file);
+
             if(cmd->output_file){
                 int output_file = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
                 int result = dup2(output_file, 1);
@@ -121,22 +189,37 @@ int interpret(struct command_line* cmd){
             
 
             int status_code = execvp(command, argument_list);
-            
-
+            if (status_code == -1) {
+                perror("execvp"); // Print an error message if execvp fails
+            }
+            exit(status_code);
                         
             return 1;
         
         }else {
 
+
+
             int status; 
+            
             for(int i = 0; i < MAX_BG; i++){
-                if(waitpid(bg_processes[i], &finished[i], WNOHANG) != 0){
+                // printf("%d", bg_processes[i]);
+                if(bg_processes[i] != 0 && waitpid(bg_processes[i], &finished[i], WNOHANG) != 0){
                     printf("Process %d has terminated\n", bg_processes[i]);
-                    fflush(stdout);
+                    bg_processes[i] = 0;
                 }
+                    fflush(stdout);
             }
+
+            
+
             if(!cmd->background){
                 waitpid(0, &status, 0);
+                foreground_exit_status = status;
+                if(status != 0){
+                printf("terminated by signal %d\n", status);
+                }
+                fflush(stdout);
             }
             
         }
@@ -154,12 +237,17 @@ int interpret(struct command_line* cmd){
 
 
 int parse_input(char* user_input){
+
+
+
     struct command_line* cmd = malloc(sizeof(struct command_line));
     char* token;
     char background;
     int count = 0;
     user_input[strcspn(user_input, "\n")] = 0;
+    
 
+    
 
 
     char* start = user_input;
@@ -183,7 +271,7 @@ int parse_input(char* user_input){
 
     //For arguments
     while(token != NULL){
-        printf("Token to be parsed: %s\n",token);
+        // printf("Token to be parsed: %s\n",token);
 
 
         // Input file
@@ -212,8 +300,12 @@ int parse_input(char* user_input){
     
 
     if(background == '&'){
-        cmd->background = 1;
-        cmd->args[count-1] = NULL;
+        if(!foreground_mode){
+            cmd->background = 1;
+            cmd->args[count-1] = NULL;
+        } else {
+            cmd->args[count-1] = NULL;
+        }
 
 
     } else{
@@ -222,6 +314,7 @@ int parse_input(char* user_input){
     }
 
     int exit = interpret(cmd);
+    
     cmd->output_file = NULL;
     cmd->input_file = NULL; 
 
