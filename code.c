@@ -101,6 +101,15 @@ int interpret(struct command_line* cmd){
 
     if(strcmp(command, "exit") == 0){
         //Handles the exit case
+        for(int i = 0; i < MAX_BG; i++){
+                // printf("%d", bg_processes[i]);
+                if(bg_processes[i] != 0 && waitpid(bg_processes[i], &finished[i], WNOHANG) == 0){
+                    kill(bg_processes[i], SIGTERM);
+                    
+                    bg_processes[i] = 0;
+                }
+                    // fflush(stdout);
+            }
         return 0;
 
     } else if(strcmp(command, "cd") == 0){
@@ -147,6 +156,12 @@ int interpret(struct command_line* cmd){
             foreground_pid = getpid();
             sa.sa_handler = SIG_DFL;
             sigaction(SIGINT, &sa, NULL);
+            struct sigaction sa_stp;
+            sa_stp.sa_handler = SIG_IGN;
+            sigaction(SIGTSTP, &sa_stp, NULL);
+            
+
+
 
 
 
@@ -170,6 +185,9 @@ int interpret(struct command_line* cmd){
 
             if(cmd->output_file){
                 int output_file = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+                if(output_file == -1){
+                    perror("Open");
+                }
                 int result = dup2(output_file, 1);
                 if(result == -1){
                     perror("dup2");
@@ -179,6 +197,7 @@ int interpret(struct command_line* cmd){
 
             if(cmd->input_file){
                 int input_file = open(cmd->input_file, O_RDONLY);
+
                 int result = dup2(input_file, 0);
                 if(result == -1){
                     perror("dup2");
@@ -206,9 +225,10 @@ int interpret(struct command_line* cmd){
                 // printf("%d", bg_processes[i]);
                 if(bg_processes[i] != 0 && waitpid(bg_processes[i], &finished[i], WNOHANG) != 0){
                     printf("Process %d has terminated\n", bg_processes[i]);
+                    
                     bg_processes[i] = 0;
                 }
-                    fflush(stdout);
+                    // fflush(stdout);
             }
 
             
@@ -216,10 +236,11 @@ int interpret(struct command_line* cmd){
             if(!cmd->background){
                 waitpid(0, &status, 0);
                 foreground_exit_status = status;
+           
                 if(status != 0){
                 printf("terminated by signal %d\n", status);
                 }
-                fflush(stdout);
+                
             }
             
         }
@@ -245,7 +266,8 @@ int parse_input(char* user_input){
     char background;
     int count = 0;
     user_input[strcspn(user_input, "\n")] = 0;
-    
+    // printf("user input is %s", user_input);
+    // fflush(stdout);
 
     
 
@@ -314,7 +336,6 @@ int parse_input(char* user_input){
     }
 
     int exit = interpret(cmd);
-    
     cmd->output_file = NULL;
     cmd->input_file = NULL; 
 
