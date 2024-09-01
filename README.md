@@ -2,10 +2,10 @@
 
 <h2>Description of files:</h2>
 <ul>
-  main.c: This is the code that creates the user interface</br>
-  code.c: This code is where all the leg work done</br>
-  smallsh: This is the executable file for the project</br>
-  p3testscript: This is the test file my graders used
+  <strong>main.c:</strong> This is the code that creates the user interface</br>
+  <strong>code.c:</strong> This code is where all the leg work done</br>
+  <strong>smallsh:</strong> This is the executable file for the project</br>
+  <strong>p3testscript:</strong> This is the test file my graders used
 </ul>
 
 <h2>Criteria (Found on the canvas page for this assignment):</h2>
