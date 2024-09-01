@@ -1,6 +1,6 @@
 This is my portfolio project for my Operating Systems 1 class. 
 
-Description of files:
+Description of files:\n\n\n
   main.c: This is the code that creates the user interface
   code.c: This code is where all the leg work done
   smallsh: This is the executable file for the project
