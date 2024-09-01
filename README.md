@@ -1,12 +1,14 @@
-This is my portfolio project for my Operating Systems 1 class. 
+<h1>This is my portfolio project for my Operating Systems 1 class.</h1>
 
-Description of files:
-  main.c: This is the code that creates the user interface
-  code.c: This code is where all the leg work done
-  smallsh: This is the executable file for the project
+<h2>Description of files:</h2>
+<ul>
+  main.c: This is the code that creates the user interface</br>
+  code.c: This code is where all the leg work done</br>
+  smallsh: This is the executable file for the project</br>
   p3testscript: This is the test file my graders used
+</ul>
 
-Criteria (Found on the canvas page for this assignment):
+<h2>Criteria (Found on the canvas page for this assignment):</h2>
 In this assignment you will write smallsh your own shell in C. smallsh will implement a subset of features of well-known shells, such as bash. Your program will
 <ol>
   <li>Provide a prompt for running commands</li>
@@ -21,10 +23,12 @@ In this assignment you will write smallsh your own shell in C. smallsh will impl
 
 
 
-Learning Outcomes
-After successful completion of this assignment, you should be able to do the following
-Describe the Unix process API (Module 4, MLO 2)
-Write programs using the Unix process API (Module 4, MLO 3)
-Explain the concept of signals and their uses (Module 5, MLO 2)
-Write programs using the Unix API for signal handling (Module 5, MLO 3)
-Explain I/O redirection and write programs that can employ I/O redirection (Module 5, MLO 4)
+<h2>Learning Outcomes:</h2>
+<ul>
+<li>After successful completion of this assignment, you should be able to do the following</li>
+<li>Describe the Unix process API (Module 4, MLO 2)</li>
+<li>Write programs using the Unix process API (Module 4, MLO 3)</li>
+<li>Explain the concept of signals and their uses (Module 5, MLO 2)</li>
+<li>Write programs using the Unix API for signal handling (Module 5, MLO 3)</li>
+<li>Explain I/O redirection and write programs that can employ I/O redirection (Module 5, MLO 4)</li>
+</ul>
