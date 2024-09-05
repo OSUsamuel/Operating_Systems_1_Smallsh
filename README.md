@@ -1,4 +1,5 @@
 <h1>This is my portfolio project for my Operating Systems 1 class.</h1>
+<p>Everything found below is directly taken from the canvas page of this assignment.  </p>
 
 <h2>Description of files:</h2>
 <ul>
@@ -8,7 +9,7 @@
   <strong>p3testscript:</strong> This is the test file my graders used
 </ul>
 
-<h2>Criteria (Found on the canvas page for this assignment):</h2>
+<h2>Criteria:</h2>
 In this assignment you will write smallsh your own shell in C. smallsh will implement a subset of features of well-known shells, such as bash. Your program will
 <ol>
   <li>Provide a prompt for running commands</li>
