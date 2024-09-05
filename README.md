@@ -1,5 +1,5 @@
 <h1>This is my portfolio project for my Operating Systems 1 class.</h1>
-<p>Everything found below is directly taken from the canvas page of this assignment.  </p>
+<p>Everything found below is directly taken from the canvas page of this assignment.  I would describe this class as the indepth analysis of the tools at your disposole.  There are definitly times where I struggled with programming but for the majroity of this class therre was no difficulty with logic or concept souly just learning about your tools and how to use them.  For the outcomes of this class I was taught the basics of operating systems and how to make access of your tools but the biggest thing I learned was a soft skill; I was taught the value of getting started early and time managment.  This was a hard class and refered to as a weed-out class but I was able to get through because I was dilligent about my time management and completed all my projcts a week in before they were due.</p>
 
 <h2>Description of files:</h2>
 <ul>
